@@ -1,0 +1,22 @@
+---
+title: "purrr_presentation"
+author: "Ben Wagner & Tshering Wangchuk"
+date: "10/31/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(purrr)
+```
+
+
+## Mapping with purrr
+
+
+
+## Working With Lists
+
