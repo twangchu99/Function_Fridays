@@ -173,22 +173,83 @@ pre code {
 
 
 <pre class="r"><code>library(purrr)</code></pre>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The Purr package belongs to the tidyverse family fundamentally used for iteration. In comparison to dplyr which mainly uses data frames, the Purr mainly works with data in a list format. The components of lists usually include:</p>
+<ul>
+<li><p>A <em>vector</em> - Logical, Character, Double or Integer.</p></li>
+<li><p>A <em>data frame</em> - storing many vectors of the same length but possibly of different types together in a single object.</p></li>
+<li><p>A <em>list</em> - is a way of storing many objects of any type (e.g. data frames, plots, vectors) together in a single object.</p></li>
+</ul>
+</div>
 <div id="mapping-with-purrr" class="section level2">
 <h2>Mapping with purrr</h2>
+<p>A <em>map function</em> applies the same action to every element of the input (such as list, vector) to the object, hence disregarding the need for for-loop functions</p>
+<p>The map functions transform the inputs of a set of elements / vectors within a list and return an object which is the same length as the input. Map functions can be categorized by the number of lists that is being passed into the function whereby the <em>output</em> of syntax is given as <em>map_…</em> for one list, <em>map2_…</em> for two lists, <em>pmap_…</em> for multiple lists and <em>imap_…</em> for a combination of lists and indexes.</p>
+<p>The transformation / output for these different functions regardless of the number of lists will always be delivered in the formats below:</p>
+<p>*map() is the main mapping function and always returns a list.</p>
+<p>*map_lgl(), map_int(), map_dbl() and map_chr() return an atomic vector, depending on the argument in the function.</p>
+<p>*map_dfr() and map_dfc() returns a data frame.</p>
+<div id="working-with-1-list" class="section level3">
+<h3>Working with 1 list</h3>
+<p>Here, we create a list of three vectors that are in double format in order to find the mean of the elements. Since the vectors in dbl format, we apply the map_dbl function and pass on the argument to find the mean, which will also be returned as a double element.</p>
+<pre class="r"><code>List_1 &lt;- list(
+  c(2.0, 2.98, 6.43),
+  c(3.5, 6.0, 7))
+
+map_dbl(List_1, mean)</code></pre>
+<pre><code>## [1] 3.803333 5.500000</code></pre>
+<pre class="r"><code>map_dbl(List_1, median)</code></pre>
+<pre><code>## [1] 2.98 6.00</code></pre>
+<p>Using the same list above, we can also use mapping to determine other results based on the argument that is being passed into the function, where you can create customized functions.</p>
+<pre class="r"><code>List_1 %&gt;% map(~ . * 2)</code></pre>
+<pre><code>## [[1]]
+## [1]  4.00  5.96 12.86
+## 
+## [[2]]
+## [1]  7 12 14</code></pre>
+<p>We can also use the mapping functions to pass other arguments such as logical arguments. Below, we test to see if the vectors in the list are numeric, which is the case. Utilizing the logical mapping function denoted by map_lgl(), our output returns TRUE as an object. Similarly, for map_chr(), the output is returned in character format and for integer, takes the value of 1 = True while 0 = False.</p>
+<pre class="r"><code>List_1 %&gt;% map_lgl(is.numeric)</code></pre>
+<pre><code>## [1] TRUE TRUE</code></pre>
+<pre class="r"><code>List_1 %&gt;% map_chr(is.character)</code></pre>
+<pre><code>## [1] &quot;FALSE&quot; &quot;FALSE&quot;</code></pre>
+<pre class="r"><code>List_1 %&gt;% map_int(is.character)</code></pre>
+<pre><code>## [1] 0 0</code></pre>
+</div>
+<div id="working-with-more-than-one-list" class="section level3">
+<h3>Working with more than one list</h3>
+<p>To demonstrate how mapping works with more than one list, we take two different lists with a set of vectors. Using the same concept as with one list, we are able to pass arguments into the functions.</p>
+<pre class="r"><code>x &lt;- list(5, 15, 10, 30, 35, 45, 50, 60, 80, 20)
+  
+y &lt;- list(10, 20, 30, 55, 25, 10, 15, 60, 70, 20)
+
+map2_dbl(x, y, ~.x + .y)</code></pre>
+<pre><code>##  [1]  15  35  40  85  60  55  65 120 150  40</code></pre>
+</div>
+<div id="mapping-to-solve-realistic-problems-with-models" class="section level3">
+<h3>Mapping to solve realistic problems with models</h3>
+<p>The example below applies the purrr package to solve a realistic problem whereby we split a data frame into pieces, fit a model to each piece, computing the summary, then obtaining the R2.</p>
+<pre class="r"><code>mtcars %&gt;%
+  split(.$cyl) %&gt;%
+  map(~ lm(mpg ~ wt, data = .)) %&gt;%
+  map(summary) %&gt;%
+  map_dbl(&quot;r.squared&quot;)</code></pre>
+<pre><code>##         4         6         8 
+## 0.5086326 0.4645102 0.4229655</code></pre>
+</div>
 </div>
 <div id="working-with-lists" class="section level2">
 <h2>Working With Lists</h2>
-<p>Since the product of most map() functions are lists, it is important to understand how to manipulate such objects using purrr. Within the package, there are multiple list specific functions which perform actions such as; filtering, summarizing, transforming, reshaping and combining.</p>
-</div>
-<div id="filtering" class="section level1">
-<h1>Filtering</h1>
+<p>Since the product of most <em>map()</em> functions are lists, it is important to understand how to manipulate such objects using purrr. Within the package, there are multiple list specific functions which perform actions such as; filtering, summarizing, transforming, reshaping and combining.</p>
+<div id="filtering" class="section level3">
+<h3>Filtering</h3>
 <pre class="r"><code>Students &lt;- list(&quot;Ben&quot;, &quot;Tshering&quot;, &quot;Anna&quot;, &quot;Mary&quot;, &quot;Chris&quot;, &quot;Joe&quot;, &quot;Nicole&quot;, &quot;Marisa&quot;, &quot;Nick&quot;, &quot;Harry&quot;)
 
 Test_Scores &lt;- list(90, 100, 83, 45, 67, 78, 55, 36, 75, 92)</code></pre>
-<p>Pluck(): The pluck function takes a list and an index (withing the bounds of the list) and returns the element at that index. If the index passed is not a valid index, the function returns NULL.</p>
+<p><em>Pluck()</em>: The pluck function takes a list and an index (withing the bounds of the list) and returns the element at that index. If the index passed is not a valid index, the function returns NULL.</p>
 <pre class="r"><code>pluck(Students, 6)</code></pre>
 <pre><code>## [1] &quot;Joe&quot;</code></pre>
-<p>Keep(): The keep function takes a list and a logical test which must be passed by the elements of the list in order for them to be included in the product. If we wanted to see all the test scores which passed the test you would write:</p>
+<p><em>Keep()</em>: The keep function takes a list and a logical test which must be passed by the elements of the list in order for them to be included in the product. If we wanted to see all the test scores which passed the test you would write:</p>
 <pre class="r"><code>keep(Test_Scores, function(x) x&gt;=65)</code></pre>
 <pre><code>## [[1]]
 ## [1] 90
@@ -211,7 +272,7 @@ Test_Scores &lt;- list(90, 100, 83, 45, 67, 78, 55, 36, 75, 92)</code></pre>
 ## [[7]]
 ## [1] 92</code></pre>
 <p>Conversely, the function discard() uses the same syntax as keep, but deletes the elements of the list that return TRUE for the logical test.</p>
-<p>Compact(): If your list contains NULL variables, the compact function returns the list passed to it without those NULL observations. It is important to not comfuse NULL and NA observations because the function does not deal with NA’s.</p>
+<p><em>Compact()</em>: If your list contains NULL variables, the compact function returns the list passed to it without those NULL observations. It is important to not comfuse NULL and NA observations because the function does not deal with NA’s.</p>
 <pre class="r"><code>compact_list &lt;- list(4, 5, 6, 7, 8, NULL, 10, NULL, 12)
 compact(compact_list)</code></pre>
 <pre><code>## [[1]]
@@ -234,7 +295,7 @@ compact(compact_list)</code></pre>
 ## 
 ## [[7]]
 ## [1] 12</code></pre>
-<p>Head_while(): This function, similar to keep/discard takes a list and a logical test. However, this function returns a list of all the elements that pass the test, checking each index in order until it reaches one that fails.</p>
+<p><em>Head_while()</em>: This function, similar to keep/discard takes a list and a logical test. However, this function returns a list of all the elements that pass the test, checking each index in order until it reaches one that fails.</p>
 <pre class="r"><code>head_list &lt;- list(&quot;Happy&quot;, &quot;Sad&quot;, &quot;Scared&quot;, 6, 5, &quot;Excited&quot;)
 head_while(head_list, is_character)</code></pre>
 <pre><code>## [[1]]
@@ -246,78 +307,78 @@ head_while(head_list, is_character)</code></pre>
 ## [[3]]
 ## [1] &quot;Scared&quot;</code></pre>
 </div>
-<div id="summarizing" class="section level1">
-<h1>Summarizing</h1>
-<p>Every(), Some(), Has_element(): These two functions are very similar, but only slightly differ for what they look for in the list. The function every() returns TRUE only if each element in the list passes the logical test that is passed when defining the function. The function some() returns true as long as 1 or more of the elements of the list pass the logical test defined. Has_element also returns a TRUE or FALSE statement, but the user passes a specific value they are searching for in the list.</p>
+<div id="summarizing" class="section level3">
+<h3>Summarizing</h3>
+<p><em>Every()</em>, <em>Some()</em>, <em>Has_element()</em>: These two functions are very similar, but only slightly differ for what they look for in the list. The function <em>every()</em> returns TRUE only if each element in the list passes the logical test that is passed when defining the function. The function <em>some()</em> returns true as long as 1 or more of the elements of the list pass the logical test defined. Has_element also returns a TRUE or FALSE statement, but the user passes a specific value they are searching for in the list.</p>
 <pre class="r"><code>every(head_list, is.numeric)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
 <pre class="r"><code>some(head_list, is.numeric)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <pre class="r"><code>has_element(head_list, 7)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<p>Detect(), Detect_index(): Detect is similar to every() and some() for what is passed to the functions, however instead of returning TRUE of FALSE, it returns the first element that passes the logical test. Detect_index() returns the first index that passes the test.</p>
+<p><em>Detect()</em>, <em>Detect_index()</em>: Detect is similar to <em>every()</em> and <em>some()</em> for what is passed to the functions, however instead of returning TRUE of FALSE, it returns the first element that passes the logical test. <em>Detect_index()</em> returns the first index that passes the test.</p>
 <pre class="r"><code>detect(head_list, is.numeric)</code></pre>
 <pre><code>## [1] 6</code></pre>
 <pre class="r"><code>detect_index(head_list, is.numeric)</code></pre>
 <pre><code>## [1] 4</code></pre>
 </div>
-<div id="reshaping-lists" class="section level1">
-<h1>Reshaping Lists</h1>
+<div id="reshaping-lists" class="section level3">
+<h3>Reshaping Lists</h3>
 <p>Reshaping lists is a very important aspect of purrr to understand because it is quite useful in the data wrangling process.</p>
-<p>Flatten(): Flatten removes the level of hierarchy from the list of lists. Flatten: _lgl(), _int(), _dbl(), _chr() all return a list of their specific types. In our example, we include rerun(n, function) which repeats a function n times which are both defined in the function.</p>
+<p><em>Flatten()</em>: Flatten removes the level of hierarchy from the list of lists. Flatten: _lgl(), _int(), _dbl(), _chr() all return a list of their specific types. In our example, we include <em>rerun(n, function)</em> which repeats a function n times which are both defined in the function.</p>
 <pre class="r"><code>x &lt;- rerun(4, sample(6))
 x</code></pre>
 <pre><code>## [[1]]
-## [1] 4 6 1 2 3 5
+## [1] 4 3 5 2 6 1
 ## 
 ## [[2]]
-## [1] 4 1 2 6 5 3
+## [1] 6 3 4 5 2 1
 ## 
 ## [[3]]
-## [1] 4 1 2 6 3 5
+## [1] 1 4 3 5 2 6
 ## 
 ## [[4]]
-## [1] 4 1 2 6 3 5</code></pre>
+## [1] 2 3 6 5 1 4</code></pre>
 <pre class="r"><code>flatten_int(x)</code></pre>
-<pre><code>##  [1] 4 6 1 2 3 5 4 1 2 6 5 3 4 1 2 6 3 5 4 1 2 6 3 5</code></pre>
-<p>Transpose(): Transpose() returns a list of pairs which is converted from a pair of lists.</p>
+<pre><code>##  [1] 4 3 5 2 6 1 6 3 4 5 2 1 1 4 3 5 2 6 2 3 6 5 1 4</code></pre>
+<p><em>Transpose()</em>: Transpose returns a list of pairs which is converted from a pair of lists.</p>
 <pre class="r"><code>a &lt;- rerun(2, x = runif(2), y = runif(3))
 a</code></pre>
 <pre><code>## [[1]]
 ## [[1]]$x
-## [1] 0.2460578 0.3011949
+## [1] 0.4237617 0.6018056
 ## 
 ## [[1]]$y
-## [1] 0.1268553 0.6655160 0.1344221
+## [1] 0.03990956 0.69500858 0.42635985
 ## 
 ## 
 ## [[2]]
 ## [[2]]$x
-## [1] 0.9976785 0.6789418
+## [1] 0.3278199 0.8992840
 ## 
 ## [[2]]$y
-## [1] 0.9405654 0.9019213 0.7575503</code></pre>
+## [1] 0.3024106 0.8031640 0.4327433</code></pre>
 <pre class="r"><code>a %&gt;% transpose() %&gt;% str()</code></pre>
 <pre><code>## List of 2
 ##  $ x:List of 2
-##   ..$ : num [1:2] 0.246 0.301
-##   ..$ : num [1:2] 0.998 0.679
+##   ..$ : num [1:2] 0.424 0.602
+##   ..$ : num [1:2] 0.328 0.899
 ##  $ y:List of 2
-##   ..$ : num [1:3] 0.127 0.666 0.134
-##   ..$ : num [1:3] 0.941 0.902 0.758</code></pre>
+##   ..$ : num [1:3] 0.0399 0.695 0.4264
+##   ..$ : num [1:3] 0.302 0.803 0.433</code></pre>
 </div>
-<div id="joining-lists" class="section level1">
-<h1>Joining Lists</h1>
+<div id="joining-lists" class="section level3">
+<h3>Joining Lists</h3>
 <p>You can join lists in two different ways. You can add a list to the end of another list or add the list to the beginning of the other.</p>
-<p>Append(): This function adds the second list passed in the definition to the end of the first. We use flatten_dbl here to show the appended list as 1.</p>
+<p><em>Append()</em>: This function adds the second list passed in the definition to the end of the first. We use flatten_dbl here to show the appended list as 1.</p>
 <pre class="r"><code>list1 &lt;- list(22, 11, 44, 55)
 list2 &lt;- list(11, 99, 77)
 flatten_dbl(append(list1, list2))</code></pre>
 <pre><code>## [1] 22 11 44 55 11 99 77</code></pre>
-<p>Prepend(): The function does the same as append(), however it adds the second list passed to the beginning of the first</p>
+<p><em>Prepend()</em>: The function does the same as <em>append()</em>, however it adds the second list passed to the beginning of the first</p>
 <pre class="r"><code>flatten_dbl(prepend(list1, list2))</code></pre>
 <pre><code>## [1] 11 99 77 22 11 44 55</code></pre>
-<p>Cross_df():This function returns a data frame where each row is a combination of list elements.</p>
+<p><em>Cross_df()</em>:This function returns a data frame where each row is a combination of list elements.</p>
 <pre class="r"><code>df &lt;- list( Scores = Test_Scores,
             name = Students,
             grade = c(4, 10, 6, 8))
@@ -403,6 +464,7 @@ df</code></pre>
 ##  9     75 Ben       4
 ## 10     92 Ben       4
 ## # ... with 390 more rows</code></pre>
+</div>
 </div>
 
 

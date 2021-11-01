@@ -95,7 +95,7 @@ mtcars %>%
 
 Since the product of most *map()* functions are lists, it is important to understand how to manipulate such objects using purrr. Within the package, there are multiple list specific functions which perform actions such as; filtering, summarizing, transforming, reshaping and combining. 
 
-# Filtering
+### Filtering
 
 ```{r}
 Students <- list("Ben", "Tshering", "Anna", "Mary", "Chris", "Joe", "Nicole", "Marisa", "Nick", "Harry")
@@ -128,7 +128,7 @@ This function, similar to keep/discard takes a list and a logical test. However,
 head_list <- list("Happy", "Sad", "Scared", 6, 5, "Excited")
 head_while(head_list, is_character)
 ```
-# Summarizing
+### Summarizing
 
 *Every()*, *Some()*, *Has_element()*:
 These two functions are very similar, but only slightly differ for what they look for in the list. The function *every()* returns TRUE only if each element in the list passes the logical test that is passed when defining the function. The function *some()* returns true as long as 1 or more of the elements of the list pass the logical test defined. Has_element also returns a TRUE or FALSE statement, but the user passes a specific value they are searching for in the list.
@@ -150,7 +150,7 @@ detect(head_list, is.numeric)
 detect_index(head_list, is.numeric)
 ```
 
-# Reshaping Lists
+### Reshaping Lists
 
 Reshaping lists is a very important aspect of purrr to understand because it is quite useful in the data wrangling process.
 
@@ -174,7 +174,7 @@ a
 a %>% transpose() %>% str()
 ```
 
-# Joining Lists
+### Joining Lists
 
 You can join lists in two different ways. You can add a list to the end of another list or add the list to the beginning of the other.
 
