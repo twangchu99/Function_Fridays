@@ -1,5 +1,5 @@
 ---
-title: "purrr_presentation"
+title: "Purrr presentation"
 author: "Ben Wagner & Tshering Wangchuk"
 date: "10/31/2021"
 output: html_document
@@ -19,4 +19,136 @@ library(purrr)
 
 
 ## Working With Lists
+
+Since the product of most map() functions are lists, it is important to understand how to manipulate such objects using purrr. Within the package, there are multiple list specific functions which perform actions such as; filtering, summarizing, transforming, reshaping and combining. 
+
+# Filtering
+
+```{r}
+Students <- list("Ben", "Tshering", "Anna", "Mary", "Chris", "Joe", "Nicole", "Marisa", "Nick", "Harry")
+
+Test_Scores <- list(90, 100, 83, 45, 67, 78, 55, 36, 75, 92)
+```
+
+
+Pluck():
+The pluck function takes a list and an index (withing the bounds of the list) and returns the element at that index. If the index passed is not a valid index, the function returns NULL.
+```{r}
+pluck(Students, 6)
+```
+Keep():
+The keep function takes a list and a logical test which must be passed by the elements of the list in order for them to be included in the product. If we wanted to see all the test scores which passed the test you would write:  
+```{r}
+keep(Test_Scores, function(x) x>=65)
+```
+Conversely, the function discard() uses the same syntax as keep, but deletes the elements of the list that return TRUE for the logical test.
+
+Compact():
+If your list contains NULL variables, the compact function returns the list passed to it without those NULL observations. It is important to not comfuse NULL and NA observations because the function does not deal with NA's.
+```{r}
+compact_list <- list(4, 5, 6, 7, 8, NULL, 10, NULL, 12)
+compact(compact_list)
+```
+Head_while():
+This function, similar to keep/discard takes a list and a logical test. However, this function returns a list of all the elements that pass the test, checking each index in order until it reaches one that fails.
+```{r}
+head_list <- list("Happy", "Sad", "Scared", 6, 5, "Excited")
+head_while(head_list, is_character)
+```
+# Summarizing
+
+Every(), Some(), Has_element():
+These two functions are very similar, but only slightly differ for what they look for in the list. The function every() returns TRUE only if each element in the list passes the logical test that is passed when defining the function. The function some() returns true as long as 1 or more of the elements of the list pass the logical test defined. Has_element also returns a TRUE or FALSE statement, but the user passes a specific value they are searching for in the list.
+```{r}
+every(head_list, is.numeric)
+```
+```{r}
+some(head_list, is.numeric)
+```
+```{r}
+has_element(head_list, 7)
+```
+
+
+Detect(), Detect_index():
+Detect is similar to every() and some() for what is passed to the functions, however instead of returning TRUE of FALSE, it returns the first element that passes the logical test. Detect_index() returns the first index that passes the test.
+```{r}
+detect(head_list, is.numeric)
+detect_index(head_list, is.numeric)
+```
+
+# Reshaping Lists
+
+Reshaping lists is a very important aspect of purrr to understand because it is quite useful in the data wrangling process.
+
+Flatten():
+Flatten removes the level of hierarchy from the list of lists. Flatten: _lgl(), _int(), _dbl(), _chr() all return a list of their specific types. 
+In our example, we include rerun(n, function) which repeats a function n times which are both defined in the function.
+```{r}
+x <- rerun(4, sample(6))
+x
+```
+```{r}
+flatten_int(x)
+```
+Transpose():
+Transpose() returns a list of pairs which is converted from a pair of lists.
+```{r}
+a <- rerun(2, x = runif(2), y = runif(3))
+a
+```
+```{r}
+a %>% transpose() %>% str()
+```
+
+# Joining Lists
+
+You can join lists in two different ways. You can add a list to the end of another list or add the list to the beginning of the other.
+
+Append():
+This function adds the second list passed in the definition to the end of the first. We use flatten_dbl here to show the appended list as 1. 
+```{r}
+list1 <- list(22, 11, 44, 55)
+list2 <- list(11, 99, 77)
+flatten_dbl(append(list1, list2))
+```
+
+Prepend():
+The function does the same as append(), however it adds the second list passed to the beginning of the first
+```{r}
+flatten_dbl(prepend(list1, list2))
+```
+
+Cross_df():This function returns a data frame where each row is a combination of list elements.
+```{r}
+df <- list( Scores = Test_Scores,
+            name = Students,
+            grade = c(4, 10, 6, 8))
+df
+
+```
+```{r}
+cross_df(df)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
