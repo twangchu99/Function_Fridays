@@ -15,3 +15,21 @@ library(purrr)
 
 
 
+```{r}
+mtcars
+```
+
+Question 1: In the mtcars dataset, are there any cars that have a quarter mile time(qsec) faster than 20 seconds? (Hint: you may need to flatten list(mtcars$qsec)). If so, create a list of those quarter mile times.
+
+```{r}
+
+```
+
+Question 2: Using the mtcars dataset, create a list of car names (Hint: use rownames() to pull the names since there is no variable for the names). Also create a list containing the transmission types for each car. For both lists you will need to flatten. From there, return the index of the first automatic car((0 = automatic, 1 = manual), and pluck that cars name from your list.
+
+```{r}
+
+```
+
+
+
