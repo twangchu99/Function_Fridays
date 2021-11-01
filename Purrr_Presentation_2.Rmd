@@ -15,34 +15,80 @@ library(purrr)
 
 ## Introduction
 
+The Purr package belongs to the tidyverse family fundamentally used for iteration. In comparison to dplyr which mainly uses data frames, the Purr mainly works with data in a list format. The components of lists usually include:
 
+* A *vector* - Logical, Character, Double or Integer.
+
+* A *data frame* - storing many vectors of the same length but possibly of different types together in a single object.
+
+* A *list* - is a way of storing many objects of any type (e.g. data frames, plots, vectors) together in a single object.
 
 
 ## Mapping with purrr
 
-The map functions transform the inputs of a set of elements / vectors within a list and return an object which is the same length as the input. Map functions can be categorized by the number of lists that is being passed into the function whereby the syntax is given as *map_* for one list, *map2_* for two lists, *pmap_* for multiple lists and *imap_* for a combination of lists and indexes.
+A *map function* applies the same action to every element of the input (such as list, vector) to the object, hence disregarding the need for for-loop functions
 
-The transformation for these different functions regardless of the number of lists will always be delivered in the formats below:
+The map functions transform the inputs of a set of elements / vectors within a list and return an object which is the same length as the input. Map functions can be categorized by the number of lists that is being passed into the function whereby the *output* of syntax is given as *map_...* for one list, *map2_...* for two lists, *pmap_...* for multiple lists and *imap_...* for a combination of lists and indexes.
+
+The transformation / output for these different functions regardless of the number of lists will always be delivered in the formats below:
 
 *map() is the main mapping function and always returns a list.
 
 *map_lgl(), map_int(), map_dbl() and map_chr() return an atomic vector, depending on the argument in the function.
 
-*map_dfr() and map_dfc() returns a data frame.
+*map_dfr() and map_dfc() returns a data frame. 
 
 ### Working with 1 list 
 
 Here, we create a list of three vectors that are in double format in order to find the mean of the elements. Since the vectors in dbl format, we apply the map_dbl function and pass on the argument to find the mean, which will also be returned as a double element. 
 
 ```{r}
-One_List <- list(
-  c(1.83, 2.98, 6.43),
-  c(2.35, 5.6, 8.5),
-  c(6.0, 7.2, 9.3))
+List_1 <- list(
+  c(2.0, 2.98, 6.43),
+  c(3.5, 6.0, 7))
 
-map_dbl(One_List, mean)
+map_dbl(List_1, mean)
+map_dbl(List_1, median)
 ```
 
+Using the same list above, we can also use mapping to determine other results based on the argument that is being passed into the function, where you can create customized functions. 
+
+```{r}
+List_1 %>% map(~ . * 2)
+```
+ 
+We can also use the mapping functions to pass other arguments such as logical arguments. Below, we test to see if the vectors in the list are numeric, which is the case. Utilizing the logical mapping function denoted by map_lgl(), our output returns TRUE as an object. Similarly, for map_chr(), the output is returned in character format and for integer, takes the value of 1 = True while 0 = False.  
+
+```{r}
+List_1 %>% map_lgl(is.numeric)
+List_1 %>% map_chr(is.character)
+List_1 %>% map_int(is.character)
+```
+
+### Working with more than one list
+
+To demonstrate how mapping works with more than one list, we take two different lists with a set of vectors. Using the same concept as with one list, we are able to pass arguments into the functions. 
+
+```{r}
+x <- list(5, 15, 10, 30, 35, 45, 50, 60, 80, 20)
+  
+y <- list(10, 20, 30, 55, 25, 10, 15, 60, 70, 20)
+
+map2_dbl(x, y, ~.x + .y)
+```
+
+
+### Mapping to solve realistic problems with models
+
+The example below applies the purrr package to solve a realistic problem whereby we split a data frame into pieces, fit a model to each piece, computing the summary, then obtaining the R2.
+
+```{r}
+mtcars %>%
+  split(.$cyl) %>%
+  map(~ lm(mpg ~ wt, data = .)) %>%
+  map(summary) %>%
+  map_dbl("r.squared")
+```
 
 
 ## Working With Lists
