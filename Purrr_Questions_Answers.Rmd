@@ -28,7 +28,7 @@ y <- c(2, 3, 4, 5)
 Power <- function(x, y){
   return(x**y)
 }
-map2(x, y, to_Power)
+map2(x, y, Power)
 ```
 
 
